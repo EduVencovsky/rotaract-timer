@@ -7,7 +7,7 @@
         border: 5px solid black;
         margin: auto;
         text-align: center;
-        font-size: 400px;
+        /* font-size: 400px; */
         color: white;
       }
       body {
@@ -15,7 +15,10 @@
       }
     </style>
   </head>
-  <body>
+  <!-- <body> -->
+  <body
+    onresize='document.getElementById("timeClock").style[ "font-size" ] = document.body.clientWidth*(3/10) + "px";'
+  >
     <br />
     <br />
     <br />
@@ -25,13 +28,14 @@
   </body>
   <script type="text/javascript">
     (function() {
-      var display = "";
       var start = false;
       var timer;
       var restartMinutes = 0;
       var restartSeconds = 0;
       var minutes = restartMinutes;
       var seconds = restartSeconds;
+      var lastTouch;
+      var timeClock = document.getElementById("timeClock");
 
       function displayTimer(minutesDisplay, secondsDisplay) {
         if (minutesDisplay.toString().length == 1) {
@@ -40,9 +44,8 @@
         if (secondsDisplay.toString().length == 1) {
           secondsDisplay = "0" + secondsDisplay;
         }
-        display = minutesDisplay + " : " + secondsDisplay;
 
-        document.getElementById("timeClock").innerText = display;
+        timeClock.innerText = minutesDisplay + " : " + secondsDisplay;
       }
 
       function setTimer() {
@@ -55,27 +58,50 @@
         displayTimer(minutes, seconds);
       }
 
-      function onKeyDown(e) {
-        if (e.key === " ") {
-          if (start) {
-            clearInterval(timer);
-          } else {
-            timer = setInterval(function() {
-              setTimer();
-            }, 1000);
-          }
-          start = !start;
-        } else if (e.key === "r") {
-          minutes = restartMinutes;
-          seconds = restartSeconds;
-          start = false;
+      function handleStart() {
+        if (start) {
           clearInterval(timer);
-          displayTimer(minutes, seconds);
+        } else {
+          timer = setInterval(function() {
+            setTimer();
+          }, 1000);
+        }
+        start = !start;
+      }
+
+      function handleReset() {
+        minutes = restartMinutes;
+        seconds = restartSeconds;
+        start = false;
+        clearInterval(timer);
+        displayTimer(minutes, seconds);
+      }
+
+      function handleKeyDown(e) {
+        if (e.key === " ") {
+          handleStart();
+        } else if (e.key === "r") {
+          handleReset();
         }
       }
 
+      function handleTouch(e) {
+        var now = new Date().getTime();
+        var timesince = now - lastTouch;
+        if (timesince < 600 && timesince > 0) {
+          handleReset();
+        } else {
+          handleStart();
+        }
+        lastTouch = new Date().getTime();
+      }
+
+      timeClock.style["font-size"] =
+        document.body.clientWidth * (3 / 10) + "px";
+      timeClock.addEventListener("touchstart", handleTouch, false);
+
       displayTimer(minutes, seconds);
-      document.addEventListener("keypress", onKeyDown);
+      document.addEventListener("keypress", handleKeyDown);
     })();
   </script>
 </html>
