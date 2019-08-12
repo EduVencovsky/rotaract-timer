@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Timer</title>
+    <style>
+      #timeClock {
+        border: 5px solid black;
+        margin: auto;
+        text-align: center;
+        font-size: 400px;
+        color: white;
+      }
+      body {
+        background-color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <div id="timeClock"></div>
+  </body>
+  <script type="text/javascript">
+    (function() {
+      var display = "";
+      var start = false;
+      var timer;
+      var restartMinutes = 0;
+      var restartSeconds = 0;
+      var minutes = restartMinutes;
+      var seconds = restartSeconds;
+
+      function displayTimer(minutesDisplay, secondsDisplay) {
+        if (minutesDisplay.toString().length == 1) {
+          minutesDisplay = "0" + minutesDisplay;
+        }
+        if (secondsDisplay.toString().length == 1) {
+          secondsDisplay = "0" + secondsDisplay;
+        }
+        display = minutesDisplay + " : " + secondsDisplay;
+
+        document.getElementById("timeClock").innerText = display;
+      }
+
+      function setTimer() {
+        if (seconds == 59) {
+          minutes++;
+          seconds = 0;
+        } else {
+          seconds++;
+        }
+        displayTimer(minutes, seconds);
+      }
+
+      function onKeyDown(e) {
+        if (e.key === " ") {
+          if (start) {
+            clearInterval(timer);
+          } else {
+            timer = setInterval(function() {
+              setTimer();
+            }, 1000);
+          }
+          start = !start;
+        } else if (e.key === "r") {
+          minutes = restartMinutes;
+          seconds = restartSeconds;
+          start = false;
+          clearInterval(timer);
+          displayTimer(minutes, seconds);
+        }
+      }
+
+      displayTimer(minutes, seconds);
+      document.addEventListener("keypress", onKeyDown);
+    })();
+  </script>
+</html>
